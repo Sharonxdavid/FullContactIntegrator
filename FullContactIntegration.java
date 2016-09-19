@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -18,10 +19,16 @@ public class FullContactIntegration {
 	public static Stats stats = new Stats();
 	public static HashMap<String, String> dictionary;
 	
-	//read input file and store in a stringbuilder
+	/**
+	 * read input file and store in a stringbuilder
+	 */
 	public static StringBuilder readFromInputFile() throws IOException{
 		StringBuilder fileContent = new StringBuilder();
-		BufferedReader br = new BufferedReader(new FileReader("addresses.txt"));
+		Scanner scanner = new Scanner( System.in );
+		System.out.println("Welcom, please insert input file name");
+		String inFile = scanner.next();
+		
+		BufferedReader br = new BufferedReader(new FileReader(inFile));
 		while (br.ready()) {
 			fileContent.append(br.readLine() + "\r\n");
 		}
@@ -132,11 +139,12 @@ public class FullContactIntegration {
 	public static void main(String[] args) throws IOException {
 		dictionary = new HashMap<>();
 		
+		
 		parseInputFile(readFromInputFile());
 		String jsonRes;
 		
 		System.out.println("*******************************");
-		System.out.println("Welcome! Here are the results:");
+		System.out.println("      Here are the results:");
 		System.out.println("*******************************");
 		
 		
