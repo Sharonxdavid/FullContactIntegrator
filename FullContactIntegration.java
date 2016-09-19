@@ -77,7 +77,9 @@ public class FullContactIntegration {
 	
 	
 	//parse json (http response) to HashMap
-	public static void parseResponse(String jsonAsString){
+	public static String parseResponse(String jsonAsString){
+		StringBuilder res = new StringBuilder();
+		
 		int age = 0;
 		JsonObject jsonObject = new JsonParser().parse(jsonAsString).getAsJsonObject();
 		double likeli = 0;
@@ -98,14 +100,14 @@ public class FullContactIntegration {
 			System.out.println("not found");
 		}
 		
-		if(!(fullName == null)){
-			System.out.print(fullName+ ", ");
+		if(!(fullName.isEmpty())){
+			res.append(fullName);
 		}
-		if (!(age == 0)){
-			System.out.print(age+ ", ");
+		if (!(age == 0)){;
+			res.append(", " + age);
 		}
-		if (!(gender == null)){
-			System.out.print(gender+ ", ");
+		if (!(gender.isEmpty())){
+			res.append(", " + gender);
 			if(gender.equalsIgnoreCase("female")){
 				stats.setFemaleCounter(stats.getFemaleCounter() + 1);
 				stats.setFemaleAccuracyAvg((stats.getFemaleAccuracyAvg() + likeli) / stats.getFemaleCounter());
@@ -116,13 +118,13 @@ public class FullContactIntegration {
 			}
 			
 		}
-		if (!(city == null)){
-			System.out.print(city + " ");
+		if (!(city.isEmpty())){
+			res.append(", " + city);
 		}
-		if (!(country == null)){
-			System.out.println(country);
+		if (!(country.isEmpty())){
+			res.append(", " + country);
 		}
-		
+		return res.toString();
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -137,18 +139,21 @@ public class FullContactIntegration {
 		System.out.println("Out of " + emailAddress.length + " employees:");
 		
 		
-		System.out.println("Here is the full list:");
+		
 		for (int i = 0; i < emailAddress.length; i++) {
 			if(dictionary.containsKey(emailAddress[i])){
 				System.out.println(dictionary.get(emailAddress[i]));
 			}
-			System.out.println(emailAddress[i]);
-//			jsonRes = getContactDetails("bart@fullcontact.com");
-			jsonRes = getContactDetails(emailAddress[i]);
-			System.out.println("***");
-			parseResponse(jsonRes);
+			else{
+				jsonRes = getContactDetails(emailAddress[i]);
+				dictionary.put(emailAddress[i], parseResponse(jsonRes));
+			}
 		}
-
+		
+		//print full list
+		System.out.println("Here is the full list:");
+		for (String string : dictionary.values()) {
+			System.out.println(string);
+		}
 	}
-
 }
