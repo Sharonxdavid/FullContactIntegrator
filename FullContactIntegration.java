@@ -17,7 +17,7 @@ public class FullContactIntegration {
 	public static String[] emailAddress;
 	public static String apiKey = "68e63d17dd554d79";
 	public static Stats stats = new Stats();
-	public static HashMap<String, String> dictionary;
+	public static HashMap<String, String> dictionary; //used as cache
 	
 	/**
 	 * read input file and store in a stringbuilder
