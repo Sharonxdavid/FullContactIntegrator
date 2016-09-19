@@ -56,8 +56,6 @@ public class FullContactIntegration {
 		con.setRequestProperty("X-FullContact-APIKey", apiKey);
 
 		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'GET' request to URL : " + url);
-		System.out.println("Response Code : " + responseCode);
 
 		BufferedReader in = new BufferedReader(
 		        new InputStreamReader(con.getInputStream()));
@@ -69,22 +67,23 @@ public class FullContactIntegration {
 		}
 		in.close();
 
-		//print result
-		//System.out.println(response.toString());
 		return (response.toString());
 		
 	}
 	
 	
-	//parse json (http response) to HashMap
+	/**
+	 * parse json (http response) to params
+	 * @param jsonAsString
+	 * @return
+	 */
 	public static String parseResponse(String jsonAsString){
 		StringBuilder res = new StringBuilder();
 		
-		int age = 0;
+		String age = "";
 		JsonObject jsonObject = new JsonParser().parse(jsonAsString).getAsJsonObject();
 		double likeli = 0;
 		String fullName = "";
-		//age = jsonObject.get("demographics").getAsJsonObject().get("age").getAsInt();
 		String gender = "";
 		String city = "";
 		String country = "";
@@ -92,18 +91,19 @@ public class FullContactIntegration {
 		try{
 		 likeli = jsonObject.get("likelihood").getAsDouble();
 		 fullName = jsonObject.get("contactInfo").getAsJsonObject().get("fullName").getAsString();
-		//age = jsonObject.get("demographics").getAsJsonObject().get("age").getAsInt();
 		 gender = jsonObject.get("demographics").getAsJsonObject().get("gender").getAsString();
 		 city = jsonObject.get("demographics").getAsJsonObject().get("locationDeduced").getAsJsonObject().get("city").getAsJsonObject().get("name").getAsString();
 		 country = jsonObject.get("demographics").getAsJsonObject().get("locationDeduced").getAsJsonObject().get("county").getAsJsonObject().get("name").getAsString();
+		 age = jsonObject.get("demographics").getAsJsonObject().get("age").getAsString();
+		 
 		}catch (Exception e){
-			System.out.println("not found");
+			//System.out.println("not found");
 		}
 		
 		if(!(fullName.isEmpty())){
 			res.append(fullName);
 		}
-		if (!(age == 0)){;
+		if (!(age == null)){
 			res.append(", " + age);
 		}
 		if (!(gender.isEmpty())){
@@ -113,7 +113,7 @@ public class FullContactIntegration {
 				stats.setFemaleAccuracyAvg((stats.getFemaleAccuracyAvg() + likeli) / stats.getFemaleCounter());
 			}
 			if(gender.equalsIgnoreCase("male")){
-				stats.setFemaleCounter(stats.getMaleCounter() + 1);
+				stats.setMaleCounter(stats.getMaleCounter() + 1);
 				stats.setMaleAccuracyAvg((stats.getMaleAccuracyAvg() + likeli) / stats.getMaleCounter());
 			}
 			
@@ -127,6 +127,8 @@ public class FullContactIntegration {
 		return res.toString();
 	}
 	
+	
+	
 	public static void main(String[] args) throws IOException {
 		dictionary = new HashMap<>();
 		
@@ -136,13 +138,12 @@ public class FullContactIntegration {
 		System.out.println("*******************************");
 		System.out.println("Welcome! Here are the results:");
 		System.out.println("*******************************");
-		System.out.println("Out of " + emailAddress.length + " employees:");
 		
 		
 		//check if user is in cache
 		for (int i = 0; i < emailAddress.length; i++) {
 			if(dictionary.containsKey(emailAddress[i])){
-				System.out.println(dictionary.get(emailAddress[i]));
+				continue;
 			}
 			else{
 				jsonRes = getContactDetails(emailAddress[i]);
@@ -155,5 +156,10 @@ public class FullContactIntegration {
 		for (String string : dictionary.values()) {
 			System.out.println(string);
 		}
+		
+		System.out.println("---------------------");
+		System.out.println("Out of " + dictionary.size() + " employees:");
+		System.out.println(stats.getFemaleCounter() + " are females (at least " + stats.getFemaleAccuracyAvg() + " accuracy)" );
+		System.out.println(stats.getMaleCounter() + " are males (at least " + stats.getMaleAccuracyAvg() + " accuracy)" );
 	}
 }
