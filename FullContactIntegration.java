@@ -139,7 +139,7 @@ public class FullContactIntegration {
 		System.out.println("Out of " + emailAddress.length + " employees:");
 		
 		
-		
+		//check if user is in cache
 		for (int i = 0; i < emailAddress.length; i++) {
 			if(dictionary.containsKey(emailAddress[i])){
 				System.out.println(dictionary.get(emailAddress[i]));
